@@ -1,6 +1,8 @@
 require('dotenv').config()
 const http = require('http')
 const { Server } = require('socket.io')
+require('./db/db')
+const Room = require('./models/room')
 
 const { PORT } = process.env
 
@@ -14,10 +16,34 @@ const io = new Server(server, {
 })
 
 io.on('connection', socket => {
-    console.log('The connection is made')
     
-    socket.on('start', () => {
-        console.log('starting a game')
+    socket.on('createRoom', async () => {
+        try {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            let desiredAccessCode = ''
+            while (desiredAccessCode.length < 4) {
+                const randomChoice = Math.floor(Math.random() * alphabet.length)
+                const randomLetter = alphabet[randomChoice]
+                desiredAccessCode += randomLetter
+                if (desiredAccessCode.length === 4) {
+                    const checkCode = await Room.findOne({ accessCode: desiredAccessCode})
+                    if (checkCode) {
+                        desiredAccessCode = ''
+                    }
+                }
+            }
+            const createdRoom = await Room.create({
+                accessCode: desiredAccessCode,
+            })
+            const { accessCode } = createdRoom
+            console.log(accessCode)
+            socket.join(accessCode)
+            io.to(accessCode).emit('accessCode', accessCode)
+        } catch (err) {
+            const d = new Date()
+            console.log(`${d.toLocaleString()}: Error creating a room`)
+            console.log(err)
+        }
     })
 })
 
