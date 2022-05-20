@@ -46,8 +46,19 @@ io.on('connection', socket => {
         }
     })
 
-    socket.on('joinRoom', roomCode => {
-        console.log(roomCode)
+    socket.on('joinRoom', async (accessCode, res) => {
+        const roomToJoin = await Room.findOne({ accessCode })
+        if (roomToJoin) {
+            res({
+                room: roomToJoin,
+                status: 'ok'
+            })
+        } else {
+            res({
+                room: null,
+                status: 'invalid'
+            })
+        }
     })
 })
 

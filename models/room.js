@@ -14,7 +14,11 @@ const roomSchema = new mongoose.Schema({
     open: {
         type: Boolean,
         default: true,
-    }
+    },
+    users: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    }]
 })
 
 const Room = mongoose.model('Room', roomSchema)
