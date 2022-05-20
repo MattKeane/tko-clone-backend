@@ -10,7 +10,7 @@ const server = http.createServer()
 
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: ['http://localhost:3000', 'http://localhost:3002'],
         methods: ['GET', 'POST']
     }
 })
@@ -44,6 +44,10 @@ io.on('connection', socket => {
             console.log(`${d.toLocaleString()}: Error creating a room`)
             console.log(err)
         }
+    })
+
+    socket.on('joinRoom', roomCode => {
+        console.log(roomCode)
     })
 })
 
