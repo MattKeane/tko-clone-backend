@@ -18,7 +18,10 @@ const io = new Server(server, {
 io.on('connection', socket => {
     
     socket.on('createRoom', async () => {
+
         try {
+
+            // generate a random access code and ensure it is unique
             const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             let desiredAccessCode = ''
             while (desiredAccessCode.length < 4) {
@@ -26,17 +29,17 @@ io.on('connection', socket => {
                 const randomLetter = alphabet[randomChoice]
                 desiredAccessCode += randomLetter
                 if (desiredAccessCode.length === 4) {
-                    const checkCode = await Room.findOne({ accessCode: desiredAccessCode})
-                    if (checkCode) {
+                    const codeExists = await Room.findOne({ accessCode: desiredAccessCode})
+                    if (codeExists) {
                         desiredAccessCode = ''
                     }
                 }
             }
+
             const createdRoom = await Room.create({
                 accessCode: desiredAccessCode,
             })
             const { accessCode } = createdRoom
-            console.log(accessCode)
             socket.join(accessCode)
             io.to(accessCode).emit('accessCode', accessCode)
         } catch (err) {
