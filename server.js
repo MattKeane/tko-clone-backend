@@ -43,6 +43,7 @@ io.on('connection', socket => {
             const { accessCode } = createdRoom
             socket.join(accessCode)
             io.to(accessCode).emit('accessCode', accessCode)
+            io.to(accessCode).emit('updateRoom', createdRoom)
         } catch (err) {
             const d = new Date()
             console.log(`${d.toLocaleString()}: Error creating a room`)
@@ -88,11 +89,12 @@ io.on('connection', socket => {
                         displayName: desiredName,
                     })
                     roomToJoin.users.push(createdUser)
-                    roomToJoin.save()
+                    await roomToJoin.save()
                     res({
                         status: 'success',
                         user: createdUser
                     })
+                    io.to(accessCode).emit('updateRoom', roomToJoin)
                 }
             } else {
                 res({
