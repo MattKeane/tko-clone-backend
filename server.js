@@ -3,6 +3,7 @@ const http = require('http')
 const { Server } = require('socket.io')
 require('./db/db')
 const Room = require('./models/room')
+const User = require('./models/user')
 
 const { PORT } = process.env
 
@@ -69,6 +70,44 @@ io.on('connection', socket => {
                 room: null,
                 status: 'error'
             })
+        }
+    })
+
+    socket.on('createUser', async (accessCode, desiredName, res) => {
+        try {
+            const roomToJoin = await Room.findOne({ accessCode }).populate('users')
+            if (roomToJoin) {
+                if (roomToJoin.users.some(user => user.displayName === desiredName)) {
+                    res({
+                        status: 'taken',
+                        user: null,
+                    })
+                } else {
+                    console.log(desiredName)
+                    const createdUser = await User.create({
+                        displayName: desiredName,
+                    })
+                    roomToJoin.users.push(createdUser)
+                    roomToJoin.save()
+                    res({
+                        status: 'success',
+                        user: createdUser
+                    })
+                }
+            } else {
+                res({
+                    status: 'invalid',
+                    user: null
+                })
+            }
+        } catch (err) {
+            res({
+                status: 'error',
+                user: null
+            })
+            const d = new Date()
+            console.log(`${d.toLocaleString()}: Error creating user.`)
+            console.log(err)
         }
     })
 })
