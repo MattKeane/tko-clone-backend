@@ -1,6 +1,8 @@
 const Room = require('../models/room')
 
+// Handles all requests from the "main" device
 function mainHandler(io, socket) {   
+    // handles creating a new room
     socket.on('createRoom', async () => {
 
         try {
