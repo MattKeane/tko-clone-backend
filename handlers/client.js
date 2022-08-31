@@ -20,6 +20,8 @@ function clientHandler(io, socket) {
                 })
             }
         } catch (err) {
+            const d = new Date()
+            console.log(`${d.toLocaleString()}: Error joining room`)
             console.log(err)
             res({
                 room: null,
