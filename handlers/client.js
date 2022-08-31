@@ -41,9 +41,10 @@ function clientHandler(io, socket) {
                         user: null,
                     })
                 } else {
-                    console.log(desiredName)
+                    // give the user the leader role if no users have been added already
                     const createdUser = await User.create({
                         displayName: desiredName,
+                        leader: roomToJoin.users.length === 0
                     })
                     roomToJoin.users.push(createdUser)
                     await roomToJoin.save()

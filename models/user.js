@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    leader: {
+        type: Boolean,
+        default: false,
+    },
     createdAt: {
         type: Date,
         expires: 3600,
