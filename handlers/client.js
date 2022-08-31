@@ -1,7 +1,10 @@
 const User = require('../models/user')
 const Room = require('../models/room')
 
+// Handles all requests from the "client" front end (i.e. users' phones)
+
 function clientHandler(io, socket) {
+    // handles joining rooms
     socket.on('joinRoom', async (accessCode, res) => {
         try {
             const roomToJoin = await Room.findOne({ accessCode })
@@ -25,6 +28,7 @@ function clientHandler(io, socket) {
         }
     })
 
+    // handles creating user names
     socket.on('createUser', async (accessCode, desiredName, res) => {
         try {
             const roomToJoin = await Room.findOne({ accessCode }).populate('users')
